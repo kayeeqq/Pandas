@@ -63,7 +63,7 @@
 	//         ^ 此处第四段为 1 表示这是一个 1.0.2 的开发版本 (develop)
 	// 
 	// 在 Windows 环境下, 程序启动时会根据第四段的值自动携带对应的版本后缀, 以便进行版本区分
-	#define Pandas_Version "1.1.0.1"
+	#define Pandas_Version "1.1.1.1"
 
 	// 在启动时显示 Pandas 的 LOGO
 	#define Pandas_Show_Logo
@@ -624,6 +624,10 @@
 	// 修正 yaml2sql 辅助工具无法生成不含 Body 节点的空 sql 问题 [Sola丶小克]
 	// 当来源文件不存在 Body 节点时, 应认为数据为空而生成空 sql 文件, 而不是直接放弃生成
 	#define	Pandas_Fix_Yaml2Sql_NoBodyNode_Break
+
+	// 修正频道系统出现频道重名时, 没有进行严格校验,
+	// 导致地图服务器结束时会提示存在内存泄露的问题 [Sola丶小克]
+	#define Pandas_Fix_Duplicate_Channel_Name_Make_MemoryLeak
 #endif // Pandas_Bugfix
 
 // ============================================================================
@@ -701,6 +705,23 @@
 	// 修正在未开启大乐透功能的情况下启动服务端, 再重新打开大乐透功能
 	// 并用 @reloadbattleconf 使之立刻生效之后, 点击大乐透按钮会导致地图服务器崩溃的问题 [Sola丶小克]
 	#define Pandas_Crashfix_RouletteData_UnInit
+
+	// 修正释放 script_code 后没有将指针置空, 导致的崩溃问题 [Sola丶小克]
+	// 感谢 Renee / HongShin 协助进行相关测试, 感谢 ╰づ记忆•斑驳〤 提出此问题
+	//
+	// 重现方法:
+	// - 编译成 Release 模式 (Debug 模式下编译器有内存访问越界保护, 无法被触发)
+	// - 登录游戏, 将 Alt+M 中的表情快捷键的 8 设置为 @reloaditemdb
+	// - 使用 @item 指令获取道具 12491, 双击执行
+	// - 不做出任何选择, 直接按 Alt+8 触发 @reloaditemdb
+	// - 完成重载后, 选择某一个菜单项 - 此时应该触发崩溃
+	// - 若没有崩溃, 则重复使用 12491 -> reload -> 选择, 直到崩溃
+	//
+	// reloaditemdb -> item_db.reload(); -> 触发每一个 item_data 的析构函数 (destruct function) ->
+	// script_free_code 释放掉 script/equip_script/unequip_script 的 script_code
+	// 但是释放后没有将对应的指针设为 NULL. 导致上述重现步骤中 script_free_state 函数针对 st->script->local.vars 
+	// 和 st->script->local.arrays 的空指针判断被绕过, 继而触发崩溃
+	#define Pandas_Crashfix_ScriptFreeCode_SetPointerNull
 #endif // Pandas_Crashfix
 
 // ============================================================================
