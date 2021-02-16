@@ -95,6 +95,9 @@
 	#ifdef Pandas_Struct_Unit_CommonData
 		// 使 s_unit_common_data 可记录单位的光环信息 [Sola丶小克]
 		#define Pandas_Struct_Unit_CommonData_Aura
+
+		// 使 s_unit_common_data 可记录战斗记录信息 [Sola丶小克]
+		#define Pandas_Struct_Unit_CommonData_BattleRecord
 	#endif // Pandas_Struct_Unit_CommonData
 
 	// 使 map_session_data 有一个独立的结构体用来存放 Pandas 的拓展 [Sola丶小克]
@@ -533,6 +536,12 @@
 	// - 解除角色或其他拥有六维属性的单位的加点上限
 	//   默认的六维属性最大上限是 32767, 解除之后理论可达到 0x7FFFFFFF
 	#define Pandas_Extreme_Computing
+
+	// 是否启用战斗记录机制 (输出, 承伤等等) [Sola丶小克]
+	// 此选项依赖 Pandas_Struct_Unit_CommonData_BattleRecord 的拓展
+	#ifdef Pandas_Struct_Unit_CommonData_BattleRecord
+		#define Pandas_BattleRecord
+	#endif // Pandas_Struct_Unit_CommonData_BattleRecord
 #endif // Pandas_CreativeWork
 
 // ============================================================================
@@ -628,6 +637,9 @@
 	// 修正频道系统出现频道重名时, 没有进行严格校验,
 	// 导致地图服务器结束时会提示存在内存泄露的问题 [Sola丶小克]
 	#define Pandas_Fix_Duplicate_Channel_Name_Make_MemoryLeak
+
+	// 修正 FAW 魔法傀儡 (技能编号: 2282) 重复扣减原石碎片的问题 [Sola丶小克]
+	#define Pandas_Fix_MagicDecoy_Twice_Deduction_Of_Ore
 #endif // Pandas_Bugfix
 
 // ============================================================================
@@ -1015,6 +1027,16 @@
 		// 事件类型: Express / 事件名称: OnPCBuffStartExpress
 		// 常量名称: NPCX_SC_START / 变量名称: sc_start_express_name
 		#define Pandas_NpcExpress_SC_START
+
+		// 当玩家进入或者改变地图时触发实时事件 [Sola丶小克]
+		// 事件类型: Express / 事件名称: OnPCEnterMapExpress
+		// 常量名称: NPCX_ENTERMAP / 变量名称: entermap_express_name
+		#define Pandas_NpcExpress_ENTERMAP
+
+		// 当游戏单位被销毁时触发实时事件 [Sola丶小克]
+		// 事件类型: Express / 事件名称: OnUnitFreeExpress
+		// 常量名称: NPCX_UNITFREE / 变量名称: unitfree_express_name
+		#define Pandas_NpcExpress_UNITFREE
 		// PYHELP - NPCEVENT - INSERT POINT - <Section 13>
 	#endif // Pandas_ScriptEngine_Express
 	
@@ -1381,6 +1403,42 @@
 	#ifdef Pandas_Aura_Mechanism
 		#define Pandas_ScriptCommand_UnitAura
 	#endif // Pandas_Aura_Mechanism
+
+	// 是否启用 getunittarget 脚本指令 [Sola丶小克]
+	// 该指令用于获取指定单位当前正在攻击的目标单位编号
+	#define Pandas_ScriptCommand_GetUnitTarget
+
+	// 是否启用 unlockcmd 脚本指令 [Sola丶小克]
+	// 该指令用于解锁实时事件和过滤器事件的指令限制, 只能用于实时或过滤器事件
+	#define Pandas_ScriptCommand_UnlockCmd
+
+	// 是否启用战斗记录相关的脚本指令 [Sola丶小克]
+	// 此选项开关需要依赖 Pandas_BattleRecord 的拓展
+	#ifdef Pandas_BattleRecord
+		// 是否启用 batrec_query 脚本指令 [Sola丶小克]
+		// 查询指定单位的战斗记录, 查看与交互目标单位产生的具体记录值
+		#define Pandas_ScriptCommand_BattleRecordQuery
+
+		// 是否启用 batrec_rank 脚本指令 [Sola丶小克]
+		// 查询指定单位的战斗记录并对记录的值进行排序, 返回排行榜单
+		#define Pandas_ScriptCommand_BattleRecordRank
+
+		// 是否启用 batrec_sortout 脚本指令 [Sola丶小克]
+		// 移除指定单位的战斗记录中交互单位已经不存在 (或下线) 的记录
+		#define Pandas_ScriptCommand_BattleRecordSortout
+
+		// 是否启用 batrec_clear 脚本指令 [Sola丶小克]
+		// 清除指定单位的战斗记录
+		#define Pandas_ScriptCommand_BattleRecordClear
+
+		// 是否启用 enable_batrec 脚本指令 [Sola丶小克]
+		// 该指令用于启用指定单位的战斗记录
+		#define Pandas_ScriptCommand_EnableBattleRecord
+
+		// 是否启用 disable_batrec 脚本指令 [Sola丶小克]
+		// 该指令用于禁用指定单位的战斗记录
+		#define Pandas_ScriptCommand_DisableBattleRecord
+	#endif // Pandas_BattleRecord
 	// PYHELP - SCRIPTCMD - INSERT POINT - <Section 1>
 #endif // Pandas_ScriptCommands
 

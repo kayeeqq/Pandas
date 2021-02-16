@@ -6821,6 +6821,9 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 			{ // Reset Damage Logs
 				memset(dstmd->dmglog, 0, sizeof(dstmd->dmglog));
 				dstmd->tdmg = 0;
+#ifdef Pandas_BattleRecord
+				batrec_reset(&md->bl);
+#endif // Pandas_BattleRecord
 			}
 		}
 		break;
@@ -11694,6 +11697,15 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 		// perform skill requirement consumption
 		skill_consume_requirement(sd,skill_id,skill_lv,2);
 	}
+
+#ifdef Pandas_BattleRecord
+	if (src && bl) {
+		if (battle_check_target(src, bl, BCT_ENEMY) > 0) {
+			batrec_cause(src, bl, 0);
+			batrec_receive(bl, src, 0);
+		}
+	}
+#endif // Pandas_BattleRecord
 
 	map_freeblock_unlock();
 	return 0;
@@ -20691,7 +20703,12 @@ int skill_magicdecoy(struct map_session_data *sd, t_itemid nameid) {
 	}
 
 	// Spawn Position
+#ifndef Pandas_Fix_MagicDecoy_Twice_Deduction_Of_Ore
+	// 上面的 if 条件已经扣减了一次原石, 下面无需重复再次扣减
+	// 因为作为技能消耗品, 但凡扣减道具总要判断返回值,
+	// 然而只有这个地方没判断, 根据经验判断, 因此应该是此处重复调用了.
 	pc_delitem(sd,i,1,0,0,LOG_TYPE_CONSUME);
+#endif // Pandas_Fix_MagicDecoy_Twice_Deduction_Of_Ore
 	x = sd->sc.comet_x;
 	y = sd->sc.comet_y;
 	sd->sc.comet_x = 0;

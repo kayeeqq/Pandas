@@ -262,6 +262,14 @@ struct Script_Config {
 #ifdef Pandas_NpcExpress_SC_START
 	const char* sc_start_express_name;	// NPCX_SC_START	// OnPCBuffStartExpress	// 当玩家成功获得一个状态(Buff)后触发实时事件
 #endif // Pandas_NpcExpress_SC_START
+
+#ifdef Pandas_NpcExpress_ENTERMAP
+	const char* entermap_express_name;	// NPCX_ENTERMAP	// OnPCEnterMapExpress	// 当玩家进入或者改变地图时触发实时事件
+#endif // Pandas_NpcExpress_ENTERMAP
+
+#ifdef Pandas_NpcExpress_UNITFREE
+	const char* unitfree_express_name;	// NPCX_UNITFREE	// OnUnitFreeExpress	// 当游戏单位被销毁时触发实时事件
+#endif // Pandas_NpcExpress_UNITFREE
 	// PYHELP - NPCEVENT - INSERT POINT - <Section 16>
 
 	// NPC related
@@ -421,6 +429,9 @@ struct script_state {
 	int bk_npcid;
 #endif // Pandas_ScriptEngine_MutliStackBackup
 	unsigned freeloop : 1;// used by buildin_freeloop
+#ifdef Pandas_ScriptCommand_UnlockCmd
+	unsigned unlockcmd : 1;
+#endif // Pandas_ScriptCommand_UnlockCmd
 	unsigned op2ref : 1;// used by op_2
 	unsigned npc_item_flag : 1;
 	unsigned mes_active : 1;  // Store if invoking character has a NPC dialog box open.
